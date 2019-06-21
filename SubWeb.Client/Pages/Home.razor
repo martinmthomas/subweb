@@ -1,0 +1,43 @@
+﻿@layout MainLayout
+@page "/"
+@inherits SubWeb.Client.Pages.CodeBehind.Home
+
+
+
+
+<div class="sidebar">
+    <div class="top-row pl-4 navbar navbar-dark">
+        <a class="navbar-brand" href="">SubWeb</a>
+    </div>
+
+    <ul class="nav flex-column">
+
+        @foreach (var navItem in NavItems)
+        {
+        <li class="nav-item px-3">
+            <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" onclick="@(async () => await NavigateToAsync(navItem.Uri))">
+                <span class="@(navItem.Type == Model.NavType.Directory ? "oi oi-project" : "")" aria-hidden="true"></span>
+                @navItem.Title
+            </a>
+        </li>
+        }
+    </ul>
+</div>
+
+
+
+<div class="main">
+    <div class="content px-4">
+
+        @if (!string.IsNullOrWhiteSpace(ExceptionMessage))
+        {
+            <p style="color:red">Exception occured: @ExceptionMessage</p>
+        }
+
+        <article class="markdown-body">
+            @((MarkupString)ConvHtml)
+        </article>
+
+
+    </div>
+</div>
