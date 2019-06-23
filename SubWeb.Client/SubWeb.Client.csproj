@@ -23,4 +23,14 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Ext\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Ext\Octokit.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

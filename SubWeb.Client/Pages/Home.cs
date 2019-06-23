@@ -52,14 +52,6 @@ namespace SubWeb.Client.Pages.CodeBehind
             {
                 ExceptionMessage = "Invalid Url";
             }
-
-            UriHelper.OnLocationChanged += UriHelper_OnLocationChanged;
-        }
-
-        private async void UriHelper_OnLocationChanged(object sender, string e)
-        {
-            ExceptionMessage = e;
-            await LoadPageAsync(e);
         }
 
         public async Task LoadPageAsync(string uri)
