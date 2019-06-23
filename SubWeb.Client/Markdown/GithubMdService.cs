@@ -36,11 +36,17 @@ namespace SubWeb.Client.Markdown
                 ? await GetDefaultRepoNameAsync(owner)
                 : repoName;
 
+            // if the path points to a markdown file, then find its folder 
+            var folder = !string.IsNullOrWhiteSpace(path) && path.EndsWith(MARKDOWN_EXT)
+                ? path.Substring(0, path.LastIndexOf("/"))
+                : path; 
+
             var files = string.IsNullOrWhiteSpace(path)
                 ? await GitClient.Repository.Content.GetAllContents(owner, repoName)
-                : await GitClient.Repository.Content.GetAllContents(owner, repoName, path);
+                : await GitClient.Repository.Content.GetAllContents(owner, repoName, folder);
 
-            return files
+
+            var sortedNavItems = files
                 .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type.Value == ContentType.Dir)
                     && !r.Name.StartsWith("."))
                 .Select(r =>
@@ -48,9 +54,15 @@ namespace SubWeb.Client.Markdown
                         r.Name,
                         owner + "/" + repoName + "/" + r.Path,
                         r.Type.Value == ContentType.Dir ? NavType.Directory : NavType.Markdown,
-                        r.Path == path ? true : false))
+                        false))
                 .OrderBy(r => r.Type)
                 .ThenBy(r => r.Title);
+
+
+            var defaultFile = path.EndsWith(MARKDOWN_EXT) ? (owner + "/" + repoName + "/" + path) : sortedNavItems.First().Uri;
+            sortedNavItems.First(n => n.Uri == defaultFile).IsDefault = true;
+
+            return sortedNavItems;
         }
 
         public async Task<string> DownloadFileAsHtmlAsync(string owner, string repoName, string filePath)
