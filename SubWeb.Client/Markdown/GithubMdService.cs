@@ -29,19 +29,22 @@ namespace SubWeb.Client.Markdown
 
         public async Task<IEnumerable<NavItem>> GetNavItemsAsync(string owner, string repoName = "", string path = "")
         {
-            if (path.EndsWith(MARKDOWN_EXT))
-                return null;
-
             repoName = string.IsNullOrWhiteSpace(repoName)
                 ? await GetDefaultRepoNameAsync(owner)
                 : repoName;
 
             // if the path points to a markdown file, then find its folder 
-            var folder = !string.IsNullOrWhiteSpace(path) && path.EndsWith(MARKDOWN_EXT)
-                ? path.Substring(0, path.LastIndexOf("/"))
-                : path; 
+            var folder = "";
+            if (!string.IsNullOrWhiteSpace(path))
+                if (path.EndsWith(MARKDOWN_EXT))
+                    if (path.Contains("/"))
+                        folder = path.Substring(0, path.LastIndexOf("/"));
+                    else
+                        folder = "";
+                else
+                    folder = path;
 
-            var files = string.IsNullOrWhiteSpace(path)
+            var files = string.IsNullOrWhiteSpace(folder)
                 ? await GitClient.Repository.Content.GetAllContents(owner, repoName)
                 : await GitClient.Repository.Content.GetAllContents(owner, repoName, folder);
 
@@ -56,11 +59,18 @@ namespace SubWeb.Client.Markdown
                         r.Type.Value == ContentType.Dir ? NavType.Directory : NavType.Markdown,
                         false))
                 .OrderBy(r => r.Type)
-                .ThenBy(r => r.Title);
+                .ThenBy(r => r.Title)
+                .ToList();
 
 
-            var defaultFile = path.EndsWith(MARKDOWN_EXT) ? (owner + "/" + repoName + "/" + path) : sortedNavItems.First().Uri;
-            sortedNavItems.First(n => n.Uri == defaultFile).IsDefault = true;
+            var defaultFile = "";
+            if (path.EndsWith(MARKDOWN_EXT))
+                defaultFile = owner + "/" + repoName + "/" + path;
+            else if (sortedNavItems.Count > 0)
+                defaultFile = sortedNavItems.First().Uri;
+
+            if (sortedNavItems.Count > 0)
+                sortedNavItems.First(nav => nav.Uri == defaultFile).IsDefault = true;
 
             return sortedNavItems;
         }
