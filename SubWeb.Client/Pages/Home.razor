@@ -15,7 +15,7 @@
         @foreach (var navItem in NavItems)
         {
         <li class="nav-item px-3">
-            <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" onclick="@(async () => await NavigateToAsync(navItem.Uri))">
+            <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" href="" onclick="@(async () => await NavigateToAsync(navItem.Uri))">
                 <span class="@(navItem.Type == Model.NavType.Directory ? "oi oi-project" : "")" aria-hidden="true"></span>
                 @navItem.Title
             </a>
