@@ -50,7 +50,7 @@ namespace SubWeb.Client.Pages.CodeBehind
             }
             else
             {
-                ExceptionMessage = "Invalid Url";
+                ExceptionMessage = "Enter a github project url in the format http://hostname/{git.username}/{git.repository} to load the markdown pages. For example, to load https://github.com/MicrosoftDocs/xamarin-docs, enter url as http://hostname/MicrosoftDocs/xamarin-docs";
             }
         }
 
