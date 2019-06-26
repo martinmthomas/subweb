@@ -31,7 +31,19 @@ namespace SubWeb.Client.Pages.CodeBehind
         public string ConvHtml;
         public string ExceptionMessage;
 
+
+        public bool collapseNavMenu = true;
+        public string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
         public IEnumerable<NavItem> NavItems = new NavItem[0];
+
+
+        private string SampleRepo = "aspnet/aspnetcore";
+        public string HomeContent = "Enter a github project url in the format {BaseUrl}/{git.username}/{git.repository} to load the markdown pages. " +
+            "For example, to load https://github.com/{SampleRepo} repository, enter url as " +
+            "<span class=\"alert-link\">{BaseUrl}/{SampleRepo}</span>";
+
+        public IEnumerable<GitRepo> StarredRepos { get; private set; } = new GitRepo[0];
+
 
         [Inject]
         public IUriHelper UriHelper { get; set; }
@@ -40,6 +52,7 @@ namespace SubWeb.Client.Pages.CodeBehind
         public IMdService GithubMdService { get; set; }
 
 
+        public void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
         protected override async Task OnInitAsync()
         {
@@ -50,17 +63,32 @@ namespace SubWeb.Client.Pages.CodeBehind
             }
             else
             {
-                ExceptionMessage = "Enter a github project url in the format http://hostname/{git.username}/{git.repository} to load the markdown pages. For example, to load https://github.com/MicrosoftDocs/xamarin-docs, enter url as http://hostname/MicrosoftDocs/xamarin-docs";
+                await SetHomeContentAsync();
             }
+        }
+
+        private async Task SetHomeContentAsync()
+        {
+            HomeContent = HomeContent
+                .Replace("{BaseUrl}", UriHelper.GetBaseUri().TrimEnd('/'))
+                .Replace("{SampleRepo}", SampleRepo);
+
+            StarredRepos = await GithubMdService.GetMostStarredRepos();
         }
 
         public async Task LoadPageAsync(string uri)
         {
+            ResetMessages();
             SetUriPartsForGit(uri);
             await GenerateNavItems();
             await GenerateBody();
         }
 
+        private void ResetMessages()
+        {
+            ExceptionMessage = "";
+            HomeContent = "";
+        }
 
         public async Task NavigateToAsync(string uri)
         {

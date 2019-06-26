@@ -8,5 +8,6 @@ namespace SubWeb.Client.Markdown
     {
         Task<string> DownloadFileAsHtmlAsync(string owner, string repoName, string filePath);
         Task<IEnumerable<NavItem>> GetNavItemsAsync(string owner, string repoName = "", string path = "");
+        Task<IEnumerable<GitRepo>> GetMostStarredRepos();
     }
 }

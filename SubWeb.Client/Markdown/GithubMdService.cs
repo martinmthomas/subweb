@@ -108,5 +108,21 @@ namespace SubWeb.Client.Markdown
         {
             return $"https://google.com/search?q={uri}";
         }
+
+
+        public async Task<IEnumerable<GitRepo>> GetMostStarredRepos()
+        {
+            var req = new SearchRepositoriesRequest()
+            {
+                SortField = RepoSearchSort.Stars,
+                Order = SortDirection.Descending,
+                PerPage = 10,
+                Created = new DateRange(DateTime.Now.AddYears(-5), DateTime.Now),
+                Updated = new DateRange(DateTime.Now.AddDays(-7), DateTime.Now)
+            };
+
+            var gitRepos = await GitClient.Search.SearchRepo(req);
+            return gitRepos.Items.Select(r => new GitRepo(r.FullName, r.Description, r.StargazersCount));
+        }
     }
 }

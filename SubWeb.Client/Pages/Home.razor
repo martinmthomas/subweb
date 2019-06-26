@@ -8,22 +8,25 @@
 <div class="sidebar">
     <div class="top-row pl-4 navbar navbar-dark">
         <a class="navbar-brand" href="">SubWeb</a>
+        <button class="navbar-toggler" onclick="@ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
     </div>
 
-    <ul class="nav flex-column">
-
-        @foreach (var navItem in NavItems)
-        {
-        <li class="nav-item px-3">
-            <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" href="" onclick="@(async () => await NavigateToAsync(navItem.Uri))">
-                <span class="@(navItem.Type == Model.NavType.Directory ? "oi oi-project" : "")" aria-hidden="true"></span>
-                @navItem.Title
-            </a>
-        </li>
-        }
-    </ul>
+    <div class="@NavMenuCssClass" onclick="@ToggleNavMenu">
+        <ul class="nav flex-column">
+            @foreach (var navItem in NavItems)
+            {
+                <li class="nav-item px-3">
+                    <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" href="" onclick="@(async () => await NavigateToAsync(navItem.Uri))">
+                        <span class="@(navItem.Type == Model.NavType.Directory ? "oi oi-project" : "")" aria-hidden="true"></span>
+                        @navItem.Title
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
 </div>
-
 
 
 <div class="main">
@@ -31,13 +34,48 @@
 
         @if (!string.IsNullOrWhiteSpace(ExceptionMessage))
         {
-            <p style="color:red">@ExceptionMessage</p>
+            <p class="text-danger">@ExceptionMessage</p>
         }
 
-        <article class="markdown-body">
-            @((MarkupString)ConvHtml)
-        </article>
 
+        @if (!string.IsNullOrWhiteSpace(HomeContent))
+        {
+            <div class="alert-info">
+                @((MarkupString)HomeContent)
+            </div>
+            <br />
+            <p>
+                Following are the top @StarredRepos.Count() most starred github repositories. To access the markdown pages, simply click on the repository/project name below. 
+                Click on <span class="small oi oi-external-link"></span> icon to access the github repository.
+            </p>
+
+            foreach (var repo in StarredRepos)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="" onclick="@(async () => await NavigateToAsync(repo.FullName))">@repo.FullName</a>
+                            <span class="badge-primary">@repo.StargazersCount</span>
+                            <a class="small ml-1" href="@("https://github.com/" + repo.FullName)" target="_blank">
+                                <span class="small oi oi-external-link"></span>
+                            </a>
+                        </h5>
+                        <p class="card-text">@repo.Description</p>
+                    </div>
+                </div>
+            }
+        }
+
+
+
+        @if (!string.IsNullOrWhiteSpace(ConvHtml))
+        {
+            <article class="markdown-body mb-5">
+
+
+                @((MarkupString)ConvHtml)
+            </article>
+        }
 
     </div>
 </div>
