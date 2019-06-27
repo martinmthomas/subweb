@@ -93,7 +93,6 @@ namespace SubWeb.Client.Pages.CodeBehind
         public async Task NavigateToAsync(string uri)
         {
             UriHelper.NavigateTo(uri, true);
-            //await LoadPageAsync(uri);
         }
 
         private async Task GenerateNavItems()
