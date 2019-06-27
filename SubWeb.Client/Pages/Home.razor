@@ -8,7 +8,7 @@
 <div class="sidebar">
     <div class="top-row pl-4 navbar navbar-dark">
         <a class="navbar-brand" href="">SubWeb</a>
-        <button class="navbar-toggler" onclick="@ToggleNavMenu">
+        <button class="navbar-toggler @(NavItems.Count() > 0 ? "border-warning" : "")" onclick="@ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
