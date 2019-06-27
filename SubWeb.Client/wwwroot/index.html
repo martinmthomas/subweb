@@ -8,9 +8,23 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+
+    <style>
+        .spinner-container {
+            position: fixed;
+            top: 50%;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <app>Loading...</app>
+    <app>
+        <div class="spinner-container text-center">
+            <div class="spinner-grow text-info" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </app>
 
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
