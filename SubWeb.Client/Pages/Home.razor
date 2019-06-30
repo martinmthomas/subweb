@@ -18,7 +18,7 @@
             @foreach (var navItem in NavItems)
             {
                 <li class="nav-item px-3">
-                    <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" href="" onclick="@(async () => await NavigateToAsync(navItem.Uri))">
+                    <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" href="@navItem.Uri">
                         <span class="@(navItem.Type == Model.NavType.Directory ? "oi oi-project" : "")" aria-hidden="true"></span>
                         @navItem.Title
                     </a>
@@ -38,7 +38,7 @@
         }
 
 
-        @if (!string.IsNullOrWhiteSpace(HomeContent))
+        @if (string.IsNullOrWhiteSpace(ConvHtml))
         {
             <div class="alert-info p-3 text-break">
                 @((MarkupString)HomeContent)
@@ -54,7 +54,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="" onclick="@(async () => await NavigateToAsync(repo.FullName))">@repo.FullName</a>
+                            <a href="@repo.FullName">@repo.FullName</a>
                             <span class="badge-primary">@repo.StargazersCount</span>
                             <a class="small ml-1" href="@("https://github.com/" + repo.FullName)" target="_blank">
                                 <span class="small oi oi-external-link"></span>

@@ -56,19 +56,30 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         protected override async Task OnInitAsync()
         {
-            var uri = UriHelper.GetAbsoluteUri();
-            if (IsValidUrl(uri))
+
+            try
             {
-                await LoadPageAsync(uri);
+                var uri = UriHelper.GetAbsoluteUri();
+                if (IsValidUrl(uri))
+                {
+                    await LoadPageAsync(uri);
+                }
+                else
+                {
+                    await SetHomeContentAsync();
+                }
             }
-            else
+            catch(Exception ex)
             {
-                await SetHomeContentAsync();
+                HandleException(ex);
             }
         }
 
         private async Task SetHomeContentAsync()
         {
+            NavItems = new NavItem[0];
+            ConvHtml = "";
+
             HomeContent = HomeContent
                 .Replace("{BaseUrl}", UriHelper.GetBaseUri().TrimEnd('/'))
                 .Replace("{SampleRepo}", SampleRepo);
@@ -80,19 +91,31 @@ namespace SubWeb.Client.Pages.CodeBehind
         {
             ResetMessages();
             SetUriPartsForGit(uri);
-            await GenerateNavItems();
-            await GenerateBody();
+
+            var navTask = GenerateNavItems();
+            var bodyTask = GenerateBody();
+
+            await navTask;
+            await bodyTask;
         }
 
         private void ResetMessages()
         {
             ExceptionMessage = "";
-            HomeContent = "";
         }
 
-        public async Task NavigateToAsync(string uri)
+        protected override Task OnParametersSetAsync()
         {
-            UriHelper.NavigateTo(uri, true);
+            UriHelper.OnLocationChanged += UriHelper_OnLocationChanged;
+
+            return base.OnParametersSetAsync();
+        }
+
+        private async void UriHelper_OnLocationChanged(object sender, string e)
+        {
+            await OnInitAsync();
+
+            this.StateHasChanged();
         }
 
         private async Task GenerateNavItems()
