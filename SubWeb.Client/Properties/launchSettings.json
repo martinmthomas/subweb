@@ -2,6 +2,10 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/SubWeb.Client",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:9027/",
       "sslPort": 0
