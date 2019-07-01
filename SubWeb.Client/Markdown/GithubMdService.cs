@@ -11,6 +11,7 @@ namespace SubWeb.Client.Markdown
     {
         public GitHubClient GitClient => new GitHubClient(new ProductHeaderValue("markdownconv"));
         const string REPO_IDENTIFIER = "subweb-", MARKDOWN_EXT = ".md";
+        const string README = "README.md";
 
         private async Task<(string Owner, string RepoName, string FilePath)> ResolveParamsAsync(string owner, string repoName = "", string filePath = "")
         {
@@ -33,35 +34,9 @@ namespace SubWeb.Client.Markdown
                 ? await GetDefaultRepoNameAsync(owner)
                 : repoName;
 
-            // if the path points to a markdown file, then find its folder 
-            var folder = "";
-            if (!string.IsNullOrWhiteSpace(path))
-                if (path.EndsWith(MARKDOWN_EXT))
-                    if (path.Contains("/"))
-                        folder = path.Substring(0, path.LastIndexOf("/"));
-                    else
-                        folder = "";
-                else
-                    folder = path;
-
-            var files = string.IsNullOrWhiteSpace(folder)
-                ? await GitClient.Repository.Content.GetAllContents(owner, repoName)
-                : await GitClient.Repository.Content.GetAllContents(owner, repoName, folder);
-
-
-            var sortedNavItems = files
-                .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type.Value == ContentType.Dir)
-                    && !r.Name.StartsWith("."))
-                .Select(r =>
-                    new NavItem(
-                        r.Name,
-                        owner + "/" + repoName + "/" + r.Path,
-                        r.Type.Value == ContentType.Dir ? NavType.Directory : NavType.Markdown,
-                        false))
-                .OrderBy(r => r.Type)
-                .ThenBy(r => r.Title)
-                .ToList();
-
+            var fileContainer = GetContainerName(path);
+            var files = await DownloadFilesAsync(owner, repoName, fileContainer);
+            var sortedNavItems = CreateNavItems(owner, repoName, files);
 
             var defaultFile = "";
             if (path.EndsWith(MARKDOWN_EXT))
@@ -75,12 +50,50 @@ namespace SubWeb.Client.Markdown
             return sortedNavItems;
         }
 
+        private string GetContainerName(string path)
+        {
+            // NOTE: aspnet/AspNetCore is taken as the example repository and project in the below examples mentioned in comments.
+            var containerName = "";
+
+            if (!string.IsNullOrWhiteSpace(path))
+                if (path.EndsWith(MARKDOWN_EXT))
+                    if (path.Contains("/")) //eg: docs/Artifacts.md. Note that "docs" is the container here.
+                        containerName = path.Substring(0, path.LastIndexOf("/"));
+                    else // eg: README.md. Note the there is no container here.
+                        containerName = "";
+                else //eg: docs. Note that this already points to a container
+                    containerName = path;
+
+            return containerName;
+        }
+
+        private List<NavItem> CreateNavItems(string owner, string repoName, IReadOnlyList<RepositoryContent> files)
+        {
+            return files
+                .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type.Value == ContentType.Dir)
+                    && !r.Name.StartsWith("."))
+                .Select(r =>
+                    new NavItem(
+                        r.Name,
+                        owner + "/" + repoName + "/" + r.Path,
+                        r.Type.Value == ContentType.Dir ? NavType.Directory : NavType.Markdown,
+                        false))
+                .OrderBy(r => r.Type)
+                .ThenBy(r => r.Title)
+                .ToList();
+        }
+
         public async Task<string> DownloadFileAsHtmlAsync(string owner, string repoName, string filePath)
         {
             var gitParams = await ResolveParamsAsync(owner, repoName, filePath);
             var mdFile = await DownloadFileAsync(gitParams.Owner, gitParams.RepoName, gitParams.FilePath);
             return await ConvertToHtml(mdFile, ResolveUri);
         }
+
+        private async Task<IReadOnlyList<RepositoryContent>> DownloadFilesAsync(string owner, string repoName, string filePath) =>
+            string.IsNullOrWhiteSpace(filePath)
+                ? await GitClient.Repository.Content.GetAllContents(owner, repoName)
+                : await GitClient.Repository.Content.GetAllContents(owner, repoName, filePath);
 
 
         private async Task<string> DownloadFileAsync(string owner, string repoName, string filePath)
