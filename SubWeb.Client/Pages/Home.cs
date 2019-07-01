@@ -29,6 +29,7 @@ namespace SubWeb.Client.Pages.CodeBehind
         }
 
         public string ConvHtml;
+        public bool ShowingHtml = false;
         public string ExceptionMessage;
 
 
@@ -80,6 +81,7 @@ namespace SubWeb.Client.Pages.CodeBehind
         {
             NavItems = new NavItem[0];
             ConvHtml = "";
+            ShowingHtml = false;
 
             HomeContent = HomeContent
                 .Replace("{BaseUrl}", UriHelper.GetBaseUri().TrimEnd('/'))
@@ -149,6 +151,7 @@ namespace SubWeb.Client.Pages.CodeBehind
             try
             {
                 ConvHtml = await GithubMdService.DownloadFileAsHtmlAsync(GitOwner, GitRepoName, GitFilePath);
+                ShowingHtml = true;
             }
             catch (Exception ex)
             {

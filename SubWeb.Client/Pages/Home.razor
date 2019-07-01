@@ -38,7 +38,7 @@
         }
 
 
-        @if (string.IsNullOrWhiteSpace(ConvHtml))
+        @if (!ShowingHtml)
         {
             <div class="alert-info p-3 text-break">
                 @((MarkupString)HomeContent)
