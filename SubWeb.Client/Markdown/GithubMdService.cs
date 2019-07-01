@@ -110,10 +110,11 @@ namespace SubWeb.Client.Markdown
         }
 
 
-        public async Task<IEnumerable<GitRepo>> GetMostStarredRepos()
+        public async Task<IEnumerable<GitRepo>> GetMostStarredRepos(string user)
         {
             var req = new SearchRepositoriesRequest()
             {
+                User = user,
                 SortField = RepoSearchSort.Stars,
                 Order = SortDirection.Descending,
                 PerPage = 10,

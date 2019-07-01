@@ -43,6 +43,7 @@ namespace SubWeb.Client.Pages.CodeBehind
             "<span class=\"alert-link\">{BaseUrl}/{SampleRepo}</span>";
 
         public IEnumerable<GitRepo> StarredRepos { get; private set; } = new GitRepo[0];
+        public const string DefaultRepoUser = "Microsoft";
 
 
         [Inject]
@@ -84,7 +85,7 @@ namespace SubWeb.Client.Pages.CodeBehind
                 .Replace("{BaseUrl}", UriHelper.GetBaseUri().TrimEnd('/'))
                 .Replace("{SampleRepo}", SampleRepo);
 
-            StarredRepos = await GithubMdService.GetMostStarredRepos();
+            StarredRepos = await GithubMdService.GetMostStarredRepos(DefaultRepoUser);
         }
 
         public async Task LoadPageAsync(string uri)
