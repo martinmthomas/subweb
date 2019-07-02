@@ -36,21 +36,13 @@ namespace SubWeb.Client.Markdown
 
             var fileContainer = GetContainerName(path);
             var files = await DownloadFilesAsync(owner, repoName, fileContainer);
+
             var sortedNavItems = CreateNavItems(owner, repoName, files);
-
-            var defaultFile = "";
-            if (path.EndsWith(MARKDOWN_EXT))
-                defaultFile = owner + "/" + repoName + "/" + path;
-            else if (sortedNavItems.Count > 0)
-                defaultFile = sortedNavItems.First().Uri;
-
-            if (sortedNavItems.Count > 0)
-                sortedNavItems.First(nav => nav.Uri == defaultFile).IsDefault = true;
 
             return sortedNavItems;
         }
 
-        public bool DoesPathReferToMarkdownFile(string path) => path.EndsWith(MARKDOWN_EXT);
+        public bool IsMarkdownFile(string path) => path.EndsWith(MARKDOWN_EXT);
 
 
 
@@ -73,7 +65,7 @@ namespace SubWeb.Client.Markdown
 
         private List<NavItem> CreateNavItems(string owner, string repoName, IReadOnlyList<RepositoryContent> files)
         {
-            return files
+            var navItems = files
                 .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type.Value == ContentType.Dir)
                     && !r.Name.StartsWith("."))
                 .Select(r =>
@@ -85,6 +77,16 @@ namespace SubWeb.Client.Markdown
                 .OrderBy(r => r.Type)
                 .ThenBy(r => r.Title)
                 .ToList();
+
+            if(navItems != null && navItems.Count > 0)
+            {
+                if (navItems.Any(n => n.Uri.EndsWith(README)))
+                    navItems.First(n => n.Uri.EndsWith(README)).IsDefault = true;
+                else if (navItems.Any(n => IsMarkdownFile(n.Uri)))
+                    navItems.First(n => IsMarkdownFile(n.Uri)).IsDefault = true;
+            }
+
+            return navItems;
         }
 
         public async Task<string> DownloadFileAsHtmlAsync(string owner, string repoName, string filePath)
@@ -102,7 +104,7 @@ namespace SubWeb.Client.Markdown
 
         private async Task<string> DownloadFileAsync(string owner, string repoName, string filePath)
         {
-            if (!filePath.EndsWith(MARKDOWN_EXT))
+            if (!IsMarkdownFile(filePath))
                 return "";
 
             var files = await GitClient.Repository.Content.GetAllContents(owner, repoName, filePath);
@@ -118,12 +120,12 @@ namespace SubWeb.Client.Markdown
         private async Task<string> GetDefaultRepoNameAsync(string owner)
         {
             var repos = await GitClient.Repository.GetAllForUser(owner);
-            return repos.First(r => r.Name.StartsWith("subweb-")).Name;
+            return repos.First(r => r.Name.StartsWith(REPO_IDENTIFIER)).Name;
         }
 
         private string ResolveUri(string uri)
         {
-            return $"https://google.com/search?q={uri}";
+            return uri;
         }
 
 

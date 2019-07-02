@@ -97,7 +97,7 @@ namespace SubWeb.Client.Pages.CodeBehind
 
             SetUriPartsForGit(uri);
 
-            if (GithubMdService.DoesPathReferToMarkdownFile(GitFilePath))
+            if (GithubMdService.IsMarkdownFile(GitFilePath))
             {
                 var navTask = GenerateNavItems();
                 var bodyTask = GenerateBody();
@@ -108,7 +108,7 @@ namespace SubWeb.Client.Pages.CodeBehind
             {
                 await GenerateNavItems();
                 var defFile = NavItems.FirstOrDefault(n => n.IsDefault);
-                if (defFile != null && GithubMdService.DoesPathReferToMarkdownFile(defFile.Uri))
+                if (defFile != null && GithubMdService.IsMarkdownFile(defFile.Uri))
                 {
                     UriHelper.NavigateTo(defFile.Uri);
                 }
