@@ -10,6 +10,16 @@ app {
     flex-direction: column;
 }
 
+.spinner-container {
+    position: fixed;
+    top: 50%;
+    width: 100%;
+}
+
+span .oi {
+    top: 0px !important;
+}
+
 .top-row {
     height: 3.5rem;
     display: flex;
