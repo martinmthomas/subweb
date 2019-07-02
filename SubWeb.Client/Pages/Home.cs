@@ -110,7 +110,8 @@ namespace SubWeb.Client.Pages.CodeBehind
                 var defFile = NavItems.FirstOrDefault(n => n.IsDefault);
                 if (defFile != null && GithubMdService.IsMarkdownFile(defFile.Uri))
                 {
-                    UriHelper.NavigateTo(defFile.Uri);
+                    SetUriPartsForGit(defFile.Uri);
+                    await GenerateBody();
                 }
             }
         }

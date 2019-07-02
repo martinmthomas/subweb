@@ -37,7 +37,7 @@ namespace SubWeb.Client.Markdown
             var fileContainer = GetContainerName(path);
             var files = await DownloadFilesAsync(owner, repoName, fileContainer);
 
-            var sortedNavItems = CreateNavItems(owner, repoName, files);
+            var sortedNavItems = CreateNavItems(owner, repoName, path, files);
 
             return sortedNavItems;
         }
@@ -63,7 +63,7 @@ namespace SubWeb.Client.Markdown
             return containerName;
         }
 
-        private List<NavItem> CreateNavItems(string owner, string repoName, IReadOnlyList<RepositoryContent> files)
+        private List<NavItem> CreateNavItems(string owner, string repoName, string requestPath, IReadOnlyList<RepositoryContent> files)
         {
             var navItems = files
                 .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type.Value == ContentType.Dir)
@@ -80,7 +80,9 @@ namespace SubWeb.Client.Markdown
 
             if(navItems != null && navItems.Count > 0)
             {
-                if (navItems.Any(n => n.Uri.EndsWith(README)))
+                if (IsMarkdownFile(requestPath))
+                    navItems.First(n => n.Uri.EndsWith(requestPath)).IsDefault = true;
+                else if (navItems.Any(n => n.Uri.EndsWith(README)))
                     navItems.First(n => n.Uri.EndsWith(README)).IsDefault = true;
                 else if (navItems.Any(n => IsMarkdownFile(n.Uri)))
                     navItems.First(n => IsMarkdownFile(n.Uri)).IsDefault = true;
