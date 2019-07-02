@@ -50,6 +50,10 @@ namespace SubWeb.Client.Markdown
             return sortedNavItems;
         }
 
+        public bool DoesPathReferToMarkdownFile(string path) => path.EndsWith(MARKDOWN_EXT);
+
+
+
         private string GetContainerName(string path)
         {
             // NOTE: aspnet/AspNetCore is taken as the example repository and project in the below examples mentioned in comments.

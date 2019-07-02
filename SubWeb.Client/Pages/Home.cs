@@ -3,6 +3,7 @@ using SubWeb.Client.Markdown;
 using SubWeb.Client.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SubWeb.Client.Pages.CodeBehind
@@ -92,19 +93,32 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         public async Task LoadPageAsync(string uri)
         {
-            ResetMessages();
+            Reset();
+
             SetUriPartsForGit(uri);
 
-            var navTask = GenerateNavItems();
-            var bodyTask = GenerateBody();
-
-            await navTask;
-            await bodyTask;
+            if (GithubMdService.DoesPathReferToMarkdownFile(GitFilePath))
+            {
+                var navTask = GenerateNavItems();
+                var bodyTask = GenerateBody();
+                await navTask;
+                await bodyTask;
+            }
+            else
+            {
+                await GenerateNavItems();
+                var defFile = NavItems.FirstOrDefault(n => n.IsDefault);
+                if (defFile != null && GithubMdService.DoesPathReferToMarkdownFile(defFile.Uri))
+                {
+                    UriHelper.NavigateTo(defFile.Uri);
+                }
+            }
         }
 
-        private void ResetMessages()
+        private void Reset()
         {
             ExceptionMessage = "";
+            ConvHtml = "";
         }
 
         protected override Task OnParametersSetAsync()
