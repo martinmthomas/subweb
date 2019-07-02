@@ -72,16 +72,16 @@ namespace SubWeb.Client.Pages.CodeBehind
                     await SetHomeContentAsync();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                HandleException(ex);
+                await HandleException(ex);
             }
         }
 
         private async Task SetHomeContentAsync()
         {
+            Reset();
             NavItems = new NavItem[0];
-            ConvHtml = "";
             ShowingHtml = false;
 
             HomeContent = HomeContent
@@ -145,7 +145,7 @@ namespace SubWeb.Client.Pages.CodeBehind
             }
             catch (Exception ex)
             {
-                HandleException(ex);
+                await HandleException(ex);
             }
         }
 
@@ -170,13 +170,17 @@ namespace SubWeb.Client.Pages.CodeBehind
             }
             catch (Exception ex)
             {
-                HandleException(ex);
+                await HandleException(ex);
             }
         }
 
-        private void HandleException(Exception ex)
+        private async Task HandleException(Exception ex)
         {
-            ExceptionMessage = ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace;
+            Console.WriteLine(ex.StackTrace); //Write to a log destination in server? Not for now, as the aim is to do Client side hosting only.
+            if (StarredRepos.Count() == 0)
+                await SetHomeContentAsync();
+
+            ExceptionMessage = ex.Message;
         }
     }
 }
