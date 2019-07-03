@@ -122,6 +122,8 @@ span .oi {
         height: 100vh;
         position: sticky;
         top: 0;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .main .top-row {
