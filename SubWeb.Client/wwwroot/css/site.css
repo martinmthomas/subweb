@@ -110,6 +110,20 @@ span .oi {
     .main .top-row {
         display: none;
     }
+
+    .sidebar {
+        max-height: 90vh;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 480px) {
+    div .sidebar {
+        max-height: 90vh;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 @media (min-width: 768px) {
