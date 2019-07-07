@@ -39,14 +39,11 @@ namespace SubWeb.Client.Pages.CodeBehind
         public IEnumerable<NavItem> NavItems = new NavItem[0];
 
 
-        private string SampleRepo = "aspnet/aspnetcore";
-        public string HomeContent = "Enter a github project url in the format {BaseUrl}/{git.username}/{git.repository} to load the markdown pages. " +
-            "For example, to load https://github.com/{SampleRepo} repository, enter url as " +
-            "<span class=\"alert-link\">{BaseUrl}/{SampleRepo}</span>";
-
+        public string SampleRepo = "aspnet/aspnetcore";
         public IEnumerable<GitRepo> StarredRepos { get; private set; } = new GitRepo[0];
         public const string DefaultRepoUser = "Microsoft";
 
+        public string GitProjUri = "";
 
         [Inject]
         public IUriHelper UriHelper { get; set; }
@@ -83,10 +80,6 @@ namespace SubWeb.Client.Pages.CodeBehind
             Reset();
             NavItems = new NavItem[0];
             ShowingHtml = false;
-
-            HomeContent = HomeContent
-                .Replace("{BaseUrl}", UriHelper.GetBaseUri().TrimEnd('/'))
-                .Replace("{SampleRepo}", SampleRepo);
 
             StarredRepos = await GithubMdService.GetMostStarredRepos(DefaultRepoUser);
         }
