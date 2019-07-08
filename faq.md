@@ -1,4 +1,4 @@
-###Frequently Asked Questions
+### Frequently Asked Questions
 
 **1. What is Blazor?**
 
@@ -16,3 +16,11 @@
 *Urls are case sensitive. Most of the DNS servers and web servers tries to guess the right web page by trying to resolve the letter case by itself. But this is not a comprehensive solution. This is a less known fact about internet. So if a file is saved as faq.md in Github, then the url must end with "faq.md" and not FAQ.md or Faq.md.*
 
 **5. What's next for SubWeb?**
+
+*There is a lot that could be improved in SubWeb. Current wish list includes,*
+- *Refactor Home page and add Unit Tests :)*
+- *Replace OctoKit with Rest Api calls to improve page load performance*
+- *Provide support to load images and other assets saved in github as part of the converted html page*
+- *Add authentication to avoid Github rate limiting*
+- *User registration and support DNS to github project mapping*
+- *Provide support for custom styling of the converted web page*
