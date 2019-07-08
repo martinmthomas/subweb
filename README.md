@@ -2,7 +2,7 @@
 
 **SubWeb** is an online tool using [Blazor][Blazor] to generate html pages from markdown files hosted in a Github repository. The main driving force behind `SubWeb` is the curiosity to experiment with and understand the capabilities of *Blazor* which is now part of [AspNetCore][AspNetGit]. For this reason, markdown conversion is implemented with the help of [CommonMark.NET][CommonMarkGit] library. 
 
-To see some of the frequently asked questions, see [faq.md][SubWebFAQ].
+There were some interesting learnings around Asyn/Await programming in single threaded browser UI, static hosting, etc. I will be writing a blog to cover these in depth. To see some of the frequently asked questions, see [faq.md][SubWebFAQ].
 
 To see the tool in action, launch [SubWeb][SubWeb].
 
