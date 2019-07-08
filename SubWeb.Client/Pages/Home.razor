@@ -38,23 +38,24 @@
         }
 
 
+
         @if (!ShowingHtml)
         {
             <div class="alert-info p-3 text-break">
                 <p><strong>SubWeb</strong> is an online tool to generate html pages from markdown files hosted in a Github repository. </p>
                 <p>
-                    To convert and load markdown pages hosted in a Github repository, enter a github project url in the format {@UriHelper.GetBaseUri().TrimEnd('/')}/{git.username}/{git.repository} in the browser address bar.
+                    To convert and load markdown pages hosted in a Github repository, enter a github project url in the format @UriHelper.GetBaseUri().TrimEnd('/')/{git.username}/{git.repository} in the browser address bar.
                     For example, to load https://github.com/@SampleRepo repository, enter url as
                     <a href="@SampleRepo">@UriHelper.GetBaseUri().TrimEnd('/')/@SampleRepo</a>
                 </p>
                 <p>
-                    <label for="basic-url">Alternately, enter the github project path in the following text box and press Generate.</label>
+                    <label for="basic-url">Alternately, enter the github project path in the following text box and press Load.</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">https://github.com/</span>
                         </div>
                         <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" aria-label="aspnet/aspnetcore" bind="@GitProjUri" />
-                        <a class="btn btn-primary ml-1" href="@GitProjUri">Generate</a>
+                        <a id="loadRepoBtn" class="btn btn-primary ml-sm-1" href="@GitProjUri">Load</a>
                     </div>
                 </p>
             </div>
