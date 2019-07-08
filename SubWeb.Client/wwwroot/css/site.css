@@ -10,6 +10,15 @@ app {
     flex-direction: column;
 }
 
+.spinner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(229, 229, 229, 0.43);
+}
+
 .spinner-container {
     position: fixed;
     top: 50%;

@@ -32,6 +32,7 @@ namespace SubWeb.Client.Pages.CodeBehind
         public string ConvHtml;
         public bool ShowingHtml = false;
         public string ExceptionMessage;
+        public bool IsLoading = false;
 
 
         public bool collapseNavMenu = true;
@@ -56,9 +57,9 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         protected override async Task OnInitAsync()
         {
-
             try
             {
+                IsLoading = true;
                 var uri = UriHelper.GetAbsoluteUri();
                 if (IsValidUrl(uri))
                 {
@@ -73,6 +74,7 @@ namespace SubWeb.Client.Pages.CodeBehind
             {
                 await HandleException(ex);
             }
+            IsLoading = false;
         }
 
         private async Task SetHomeContentAsync()

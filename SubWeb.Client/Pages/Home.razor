@@ -38,6 +38,17 @@
         }
 
 
+        @if (IsLoading)
+        {
+            <div class="spinner-overlay">
+                <div class="spinner-container text-center">
+                    <div class="spinner-grow text-info" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        }
+
 
         @if (!ShowingHtml)
         {
