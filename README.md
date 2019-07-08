@@ -6,12 +6,18 @@ Because Blazor's client side hosting model is used, `SubWeb` executes completely
 
 To see the tool in action, launch [SubWeb][SubWeb].
 
+#### Contributions
+
+[All sort of contributions are welcome! If you have a proposed solution to improve some area of the app, then feel free to raise a Pull Request. If you are just curious to know more about the project or have questions, you can reach out to me on [Twitter][Twitter] or [LinkedIn][LinkedIn]
+
 
 [Blazor]: https://dotnet.microsoft.com/apps/aspnet/web-apps/client
 [AspNetGit]: https://github.com/aspnet/AspNetCore
 [CommonMarkGit]: https://github.com/Knagis/CommonMark.NET
 [SubWebFAQ]: https://subweb.azurewebsites.net/martinmthomas/subweb/faq.md
 [SubWeb]: https://subweb.azurewebsites.net
+[Twitter]: https://twitter.com/martinmthomas
+[LinkedIn]: https://www.linkedin.com/in/martin-mathai-thomas-4bb6a66a/
 
 [link1]: https://github.com/aspnet/Blazor/issues/1413
 [link2]: https://itnext.io/mvvm-and-blazor-components-and-statehaschanged-a31be365638b
