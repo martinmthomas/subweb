@@ -8,7 +8,7 @@ To see the tool in action, launch [SubWeb][SubWeb].
 
 #### Contributions
 
-[All sort of contributions are welcome! If you have a proposed solution to improve some area of the app, then feel free to raise a Pull Request. If you are just curious to know more about the project or have questions, you can reach out to me on [Twitter][Twitter] or [LinkedIn][LinkedIn]
+All sort of contributions are welcome! If you have a proposed solution to improve some area of the app, then feel free to raise a Pull Request. If you are just curious to know more about the project or have questions, you can reach out to me on [Twitter][Twitter] or [LinkedIn][LinkedIn]
 
 
 [Blazor]: https://dotnet.microsoft.com/apps/aspnet/web-apps/client
