@@ -12,14 +12,14 @@
 
 *In order to make C# code executable in browser, Blazor needs to download the core libraries like mscorlib.dll to provide the .net ecosystem. Currently, there are multiple of them and these take around 3MB space in total. Downloading these files in browser could take a while depending on the connection speed. Note that this should be a one time issue only as Blazor caches the libraries just like any other asset.*
 
-**4. Sometimes I get errors that url is incorrect**
+**4. Sometimes I get errors that url cannot be found**
 
-*Urls are case sensitive. Most of the DNS servers and web servers tries to guess the right web page by trying to resolve the letter case by itself. But this is not a comprehensive solution. This is a less known fact about internet. So if a file is saved as faq.md in Github, then the url must end with "faq.md" and not FAQ.md or Faq.md.*
+*Urls are case sensitive. This is a less known fact. But most of the DNS servers and web servers try to guess the right web page url by trying to resolve the letter case by itself. But this does not work all the time. So if a file is saved as faq.md in Github, then the url must end with "faq.md" and not FAQ.md or Faq.md.*
 
 **5. What's next for SubWeb?**
 
 *There is a lot that could be improved in SubWeb. Current wish list includes,*
-- *Refactor Home page and add Unit Tests :)*
+- *Refactor Home page and add Unit Tests :grin:*
 - *Replace OctoKit with Rest Api calls to improve page load performance*
 - *Provide support to load images and other assets saved in github as part of the converted html page*
 - *Add authentication to avoid Github rate limiting*
