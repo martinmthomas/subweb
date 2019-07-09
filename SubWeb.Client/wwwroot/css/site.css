@@ -120,7 +120,7 @@ span .oi {
         max-height: 90vh;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
-    }?
+    }
 
     #loadRepoBtn {
         position: relative;
