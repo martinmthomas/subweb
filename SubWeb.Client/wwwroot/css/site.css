@@ -115,6 +115,10 @@ span .oi {
     color: red;
 }
 
+.card-title .badge-primary {
+    display: inline-block;
+}
+
 @media (max-width: 575.98px) {
     div .sidebar {
         max-height: 90vh;

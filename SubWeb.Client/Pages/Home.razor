@@ -54,13 +54,8 @@
         {
             <div class="alert-info p-3 text-break">
                 <p><strong>SubWeb</strong> is an online tool to generate html pages from markdown files hosted in a Github repository. For more details see <a href="@UriHelper.GetBaseUri().TrimEnd('/')/martinmthomas/subweb/README.md">documentation</a>.</p>
-                <p>
-                    To convert and load markdown pages hosted in a Github repository, enter a github project url in the format @UriHelper.GetBaseUri().TrimEnd('/')/{git.username}/{git.repository} in the browser address bar.
-                    For example, to load https://github.com/@SampleRepo repository, enter url as
-                    <a href="@SampleRepo">@UriHelper.GetBaseUri().TrimEnd('/')/@SampleRepo</a>
-                </p>
-                <p>
-                    <label for="basic-url">Alternately, enter the github project path in the following text box and press Load.</label>
+                                <p>
+                    <label for="basic-url">Enter the github project path in the following text box and press Load.</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">Github path</span>
@@ -70,8 +65,7 @@
                     </div>
                 </p>
             </div>
-            <br />
-            <p>
+            <p class="mt-5">
                 Following are the top @StarredRepos.Count() most starred github projects under @DefaultRepoUser repository. To access the markdown pages, simply click on the repository/project name below.
                 Click on <span class="small oi oi-external-link"></span> icon to access the github repository.
             </p>
