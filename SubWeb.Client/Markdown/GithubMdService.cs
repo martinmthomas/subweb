@@ -1,4 +1,5 @@
-﻿using Octokit;
+﻿using SubWeb.Client.Exceptions;
+using SubWeb.Client.Ext.Github.Model;
 using SubWeb.Client.Model;
 using System;
 using System.Collections.Generic;
@@ -9,17 +10,22 @@ namespace SubWeb.Client.Markdown
 {
     public class GithubMdService : MdBase, IMdService
     {
-        public GitHubClient GitClient => new GitHubClient(new ProductHeaderValue("markdownconv"));
         const string REPO_IDENTIFIER = "subweb-", MARKDOWN_EXT = ".md";
         const string README = "README.md";
 
+        private Github.Services.IRepository GithubRepo { get; set; }
+
+        public GithubMdService(Github.Services.IRepository githubRepo)
+        {
+            GithubRepo = githubRepo;
+        }
+
         private async Task<(string Owner, string RepoName, string FilePath)> ResolveParamsAsync(string owner, string repoName = "", string filePath = "")
         {
-            if (string.IsNullOrWhiteSpace(repoName) && !string.IsNullOrWhiteSpace(filePath))
-                throw new ArgumentException("Repository Name cannot be blank when File Path is supplied");
+            if (!string.IsNullOrWhiteSpace(filePath))
+                Ensure.ArgumentNotEmpty(repoName, nameof(repoName));
 
-            if (string.IsNullOrWhiteSpace(owner))
-                throw new ArgumentException("Owner cannot be blank");
+            Ensure.ArgumentNotEmpty(owner, nameof(owner));
 
             repoName = string.IsNullOrWhiteSpace(repoName) ? await GetDefaultRepoNameAsync(owner) : repoName;
             filePath = string.IsNullOrWhiteSpace(filePath) ? await GetDefaultFilePathAsync(owner, repoName) : filePath;
@@ -63,22 +69,22 @@ namespace SubWeb.Client.Markdown
             return containerName;
         }
 
-        private List<NavItem> CreateNavItems(string owner, string repoName, string requestPath, IReadOnlyList<RepositoryContent> files)
+        private List<NavItem> CreateNavItems(string owner, string repoName, string requestPath, IReadOnlyCollection<ContentInfo> files)
         {
             var navItems = files
-                .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type.Value == ContentType.Dir)
+                .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type == "dir")
                     && !r.Name.StartsWith("."))
                 .Select(r =>
                     new NavItem(
                         r.Name,
                         owner + "/" + repoName + "/" + r.Path,
-                        r.Type.Value == ContentType.Dir ? NavType.Directory : NavType.Markdown,
+                        r.Type == "dir" ? NavType.Directory : NavType.Markdown,
                         false))
                 .OrderBy(r => r.Type)
                 .ThenBy(r => r.Title)
                 .ToList();
 
-            if(navItems != null && navItems.Count > 0)
+            if (navItems != null && navItems.Count > 0)
             {
                 if (IsMarkdownFile(requestPath))
                     navItems.First(n => n.Uri.EndsWith(requestPath)).IsDefault = true;
@@ -98,10 +104,10 @@ namespace SubWeb.Client.Markdown
             return await ConvertToHtml(mdFile, ResolveUri);
         }
 
-        private async Task<IReadOnlyList<RepositoryContent>> DownloadFilesAsync(string owner, string repoName, string filePath) =>
+        private async Task<IReadOnlyCollection<ContentInfo>> DownloadFilesAsync(string owner, string repoName, string filePath) =>
             string.IsNullOrWhiteSpace(filePath)
-                ? await GitClient.Repository.Content.GetAllContents(owner, repoName)
-                : await GitClient.Repository.Content.GetAllContents(owner, repoName, filePath);
+                ? await GithubRepo.GetAllContents(owner, repoName, "")
+                : await GithubRepo.GetAllContents(owner, repoName, filePath);
 
 
         private async Task<string> DownloadFileAsync(string owner, string repoName, string filePath)
@@ -109,19 +115,19 @@ namespace SubWeb.Client.Markdown
             if (!IsMarkdownFile(filePath))
                 return "";
 
-            var files = await GitClient.Repository.Content.GetAllContents(owner, repoName, filePath);
-            return files.First().Content;
+            var file = await GithubRepo.GetFileContent(owner, repoName, filePath);
+            return file.Content;
         }
 
         private async Task<string> GetDefaultFilePathAsync(string owner, string repoName)
         {
-            var _files = await GitClient.Repository.Content.GetAllContents(owner, repoName);
+            var _files = await GithubRepo.GetAllContents(owner, repoName, "");
             return _files.First(f => f.Name.EndsWith(MARKDOWN_EXT)).Path;
         }
 
         private async Task<string> GetDefaultRepoNameAsync(string owner)
         {
-            var repos = await GitClient.Repository.GetAllForUser(owner);
+            var repos = await GithubRepo.GetAllForUser(owner);
             return repos.First(r => r.Name.StartsWith(REPO_IDENTIFIER)).Name;
         }
 
@@ -133,18 +139,9 @@ namespace SubWeb.Client.Markdown
 
         public async Task<IEnumerable<GitRepo>> GetMostStarredRepos(string user)
         {
-            var req = new SearchRepositoriesRequest()
-            {
-                User = user,
-                SortField = RepoSearchSort.Stars,
-                Order = SortDirection.Descending,
-                PerPage = 10,
-                Created = new DateRange(DateTime.Now.AddYears(-5), DateTime.Now),
-                Updated = new DateRange(DateTime.Now.AddDays(-7), DateTime.Now)
-            };
+            var gitRepos = await GithubRepo.Search(user, DateTimeOffset.Now.AddYears(-5), DateTimeOffset.Now.AddDays(-7), 1, 10, "stars", "desc");
 
-            var gitRepos = await GitClient.Search.SearchRepo(req);
-            return gitRepos.Items.Select(r => new GitRepo(r.FullName, r.Description, r.StargazersCount));
+            return gitRepos.Items.Select(r => new GitRepo(r.Full_Name, r.Description, r.Stargazers_Count));
         }
     }
 }
