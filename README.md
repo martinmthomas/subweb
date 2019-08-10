@@ -22,6 +22,13 @@ https://subweb.azurewebsites.net/{GithubRepository}/{GithubProjectName}/{Markdow
 If you have a proposed solution to improve some area of the app, then feel free to raise a Pull Request. If you are just curious to know more about the project or have questions, you can reach out to me on [Twitter][Twitter] or on [LinkedIn][LinkedIn]
 
 
+## WishList
+1. Refactor Home page and add Unit Tests
+2. Provide support to load images and other assets saved in github as part of the converted html page
+3. Add authentication to avoid Github rate limiting
+4. User registration and support "DNS to github project" mapping
+5. Provide support for custom styling of the converted web page
+
 [Blazor]: https://dotnet.microsoft.com/apps/aspnet/web-apps/client
 [AspNetGit]: https://github.com/aspnet/AspNetCore
 [CommonMarkGit]: https://github.com/Knagis/CommonMark.NET

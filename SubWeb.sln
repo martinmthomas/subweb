@@ -5,6 +5,17 @@ VisualStudioVersion = 16.0.28917.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SubWeb.Client", "SubWeb.Client\SubWeb.Client.csproj", "{A0A37782-732D-42F2-A8D6-EDEEBA814E7B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{6B9792B9-4BB0-4530-BB65-2C27246C3AB0}"
+	ProjectSection(SolutionItems) = preProject
+		faq.md = faq.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{AC0A0DEB-911D-4531-ADAA-6FBFA2720254}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

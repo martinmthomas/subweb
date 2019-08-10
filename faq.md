@@ -19,11 +19,4 @@ Urls are case sensitive. This is a less known fact. But most of the DNS servers 
 
 **5. What's next for SubWeb?**
 
-There is a lot that could be improved in SubWeb. Current wish list includes,
-
-- Refactor Home page and add Unit Tests
-- Replace OctoKit with Rest Api calls to improve page load performance
-- Provide support to load images and other assets saved in github as part of the converted html page
-- Add authentication to avoid Github rate limiting
-- User registration and support "DNS to github project" mapping
-- Provide support for custom styling of the converted web page
+See WishList section in README.md.
