@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using SubWeb.Client.Markdown;
 using SubWeb.Client.Model;
+using SubWeb.Client.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,6 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         public string ConvHtml;
         public bool ShowingHtml = false;
-        public string ExceptionMessage;
         public bool IsLoading = false;
 
 
@@ -51,6 +51,9 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         [Inject]
         public IMdService GithubMdService { get; set; }
+
+        [Inject]
+        public IAlertService AlertService { get; set; }
 
 
         public void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
@@ -113,7 +116,6 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         private void Reset()
         {
-            ExceptionMessage = "";
             ConvHtml = "";
         }
 
@@ -172,10 +174,11 @@ namespace SubWeb.Client.Pages.CodeBehind
         private async Task HandleException(Exception ex)
         {
             Console.WriteLine(ex.StackTrace); //Write to a log destination in server? Not for now, as the aim is to do Client side hosting only.
+
+            await AlertService.ErrorAsync(ex.Message);
+
             if (StarredRepos.Count() == 0)
                 await SetHomeContentAsync();
-
-            ExceptionMessage = ex.Message;
         }
     }
 }

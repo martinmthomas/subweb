@@ -32,29 +32,14 @@
 <div class="main">
     <div class="content px-4">
 
-        @if (!string.IsNullOrWhiteSpace(ExceptionMessage))
-        {
-            <p class="text-danger">@ExceptionMessage</p>
-        }
-
-
-        @if (IsLoading)
-        {
-            <div class="spinner-overlay">
-                <div class="spinner-container text-center">
-                    <div class="spinner-grow text-info" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-            </div>
-        }
+        <Loading InProgress="IsLoading"></Loading>
 
 
         @if (!ShowingHtml)
         {
             <div class="alert-info p-3 text-break">
                 <p><strong>SubWeb</strong> is an online tool to generate html pages from markdown files hosted in Github repositories. For more details see <a href="@UriHelper.GetBaseUri().TrimEnd('/')/martinmthomas/subweb/README.md">documentation</a>.</p>
-                                <p>
+                <p>
                     <label for="basic-url">Enter the github project path in the following text box and press Load.</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">

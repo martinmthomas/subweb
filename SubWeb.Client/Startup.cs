@@ -2,6 +2,7 @@ using Github.Services;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SubWeb.Client.Markdown;
+using SubWeb.Client.Services;
 
 namespace SubWeb.Client
 {
@@ -11,6 +12,7 @@ namespace SubWeb.Client
         {
             services.AddSingleton<IMdService, GithubMdService>();
             services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<IAlertService, AlertService>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)
