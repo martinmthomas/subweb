@@ -11,24 +11,7 @@ namespace SubWeb.Client.Pages.CodeBehind
 {
     public class Home : ComponentBase
     {
-        private string[] UriParts;
-        public string GitOwner => UriParts.Length > 1 ? UriParts[1] : "";
-        public string GitRepoName => UriParts.Length > 2 ? UriParts[2] : "";
-        public string GitFilePath
-        {
-            get
-            {
-                if (UriParts.Length > 3)
-                {
-                    var path = "";
-                    for (int i = 3; i < UriParts.Length; i++)
-                        path += UriParts[i] + "/";
-                    return path.TrimEnd('/');
-                }
-
-                return "";
-            }
-        }
+        public GithubUri githubUri = new GithubUri();
 
         public string ConvHtml;
         public bool ShowingHtml = false;
@@ -95,7 +78,7 @@ namespace SubWeb.Client.Pages.CodeBehind
 
             SetUriPartsForGit(uri);
 
-            if (GithubMdService.IsMarkdownFile(GitFilePath))
+            if (GithubMdService.IsMarkdownFile(githubUri.FilePath))
             {
                 var navTask = GenerateNavItems();
                 var bodyTask = GenerateBody();
@@ -137,7 +120,7 @@ namespace SubWeb.Client.Pages.CodeBehind
         {
             try
             {
-                var navItems = await GithubMdService.GetNavItemsAsync(GitOwner, GitRepoName, GitFilePath);
+                var navItems = await GithubMdService.GetNavItemsAsync(githubUri.Owner, githubUri.RepoName, githubUri.FilePath);
                 NavItems = navItems != null ? navItems : NavItems;
             }
             catch (Exception ex)
@@ -149,7 +132,7 @@ namespace SubWeb.Client.Pages.CodeBehind
         private void SetUriPartsForGit(string uri)
         {
             uri = uri.StartsWith(UriHelper.GetBaseUri()) ? uri : (UriHelper.GetBaseUri() + uri);
-            UriParts = uri
+            githubUri.UriParts = uri
                 .Split(new string[] { "//" }, StringSplitOptions.None)[1]
                 .Split('/');
         }
@@ -162,7 +145,7 @@ namespace SubWeb.Client.Pages.CodeBehind
         {
             try
             {
-                ConvHtml = await GithubMdService.DownloadFileAsHtmlAsync(GitOwner, GitRepoName, GitFilePath);
+                ConvHtml = await GithubMdService.DownloadFileAsHtmlAsync(githubUri.Owner, githubUri.RepoName, githubUri.FilePath);
                 ShowingHtml = true;
             }
             catch (Exception ex)
