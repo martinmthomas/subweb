@@ -38,6 +38,8 @@ namespace SubWeb.Client.Pages.CodeBehind
         [Inject]
         public IAlertService AlertService { get; set; }
 
+        [Inject]
+        public IGithubUriService GithubUriService { get; set; }
 
         public void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
@@ -46,10 +48,9 @@ namespace SubWeb.Client.Pages.CodeBehind
             try
             {
                 IsLoading = true;
-                var uri = UriHelper.GetAbsoluteUri();
-                if (IsValidUrl(uri))
+                if (GithubUriService.IsCurrentUriValid())
                 {
-                    await LoadPageAsync(uri);
+                    await LoadPageAsync();
                 }
                 else
                 {
@@ -66,19 +67,17 @@ namespace SubWeb.Client.Pages.CodeBehind
         private async Task SetHomeContentAsync()
         {
             Reset();
-            NavItems = new NavItem[0];
+
             ShowingHtml = false;
 
             StarredRepos = await GithubMdService.GetMostStarredRepos(DefaultRepoUser);
         }
 
-        public async Task LoadPageAsync(string uri)
+        public async Task LoadPageAsync()
         {
             Reset();
 
-            SetUriPartsForGit(uri);
-
-            if (GithubMdService.IsMarkdownFile(githubUri.FilePath))
+            if (githubUri.IsMarkdownFile)
             {
                 var navTask = GenerateNavItems();
                 var bodyTask = GenerateBody();
@@ -88,10 +87,10 @@ namespace SubWeb.Client.Pages.CodeBehind
             else
             {
                 await GenerateNavItems();
-                var defFile = NavItems.FirstOrDefault(n => n.IsDefault);
-                if (defFile != null && GithubMdService.IsMarkdownFile(defFile.Uri))
+                var defaultFile = NavItems.FirstOrDefault(n => n.IsDefault);
+                if (defaultFile != null && GithubUri.CheckIfMarkdownFile(defaultFile.Uri))
                 {
-                    SetUriPartsForGit(defFile.Uri);
+                    githubUri = GithubUriService.CreateGithubUriModel(defaultFile.Uri);
                     await GenerateBody();
                 }
             }
@@ -100,6 +99,8 @@ namespace SubWeb.Client.Pages.CodeBehind
         private void Reset()
         {
             ConvHtml = "";
+            NavItems = new NavItem[0];
+            githubUri = GithubUriService.CreateGithubUriModel();
         }
 
         protected override Task OnParametersSetAsync()
@@ -113,39 +114,27 @@ namespace SubWeb.Client.Pages.CodeBehind
         {
             await OnInitAsync();
 
-            this.StateHasChanged();
+            StateHasChanged();
         }
 
         private async Task GenerateNavItems()
         {
             try
             {
-                var navItems = await GithubMdService.GetNavItemsAsync(githubUri.Owner, githubUri.RepoName, githubUri.FilePath);
+                var navItems = await GithubMdService.GetNavItemsAsync(githubUri);
                 NavItems = navItems != null ? navItems : NavItems;
             }
             catch (Exception ex)
             {
                 await HandleException(ex);
             }
-        }
-
-        private void SetUriPartsForGit(string uri)
-        {
-            uri = uri.StartsWith(UriHelper.GetBaseUri()) ? uri : (UriHelper.GetBaseUri() + uri);
-            githubUri.UriParts = uri
-                .Split(new string[] { "//" }, StringSplitOptions.None)[1]
-                .Split('/');
-        }
-
-        private bool IsValidUrl(string uri) => (uri.Split(new string[] { "//" }, StringSplitOptions.RemoveEmptyEntries)[1]
-                .Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)
-                .Length) > 1;
+        }      
 
         private async Task GenerateBody()
         {
             try
             {
-                ConvHtml = await GithubMdService.DownloadFileAsHtmlAsync(githubUri.Owner, githubUri.RepoName, githubUri.FilePath);
+                ConvHtml = await GithubMdService.DownloadFileAsHtmlAsync(githubUri);
                 ShowingHtml = true;
             }
             catch (Exception ex)

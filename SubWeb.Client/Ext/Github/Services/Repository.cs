@@ -24,7 +24,7 @@ namespace Github.Services
         }
 
 
-        public async Task<IReadOnlyCollection<ContentInfo>> GetAllContents(string owner, string repoName, string path)
+        public async Task<IReadOnlyCollection<ContentInfo>> GetAllContentsAsync(string owner, string repoName, string path)
         {
             Ensure.ArgumentNotEmpty(owner, nameof(owner));
             Ensure.ArgumentNotEmpty(repoName, nameof(repoName));
@@ -38,7 +38,7 @@ namespace Github.Services
         }
 
 
-        public async Task<File> GetFileContent(string owner, string repoName, string path)
+        public async Task<File> GetFileContentAsync(string owner, string repoName, string path)
         {
             Ensure.ArgumentNotEmpty(owner, nameof(owner));
             Ensure.ArgumentNotEmpty(repoName, nameof(repoName));
@@ -55,7 +55,7 @@ namespace Github.Services
         }
 
 
-        public async Task<List<Repo>> GetAllForUser(string owner)
+        public async Task<List<Repo>> GetAllForUserAsync(string owner)
         {
             var url = GITHUB_REPOS_URL.Replace(UriParts.OWNER, owner);
 
@@ -63,7 +63,7 @@ namespace Github.Services
         }
 
 
-        public async Task<SearchResponse> Search(string owner, DateTimeOffset createdDate, DateTimeOffset lastUpdatedDate, int pageIndex, int itemsPerPage = 10, string sortBy = "stars", string orderBy = "desc")
+        public async Task<SearchResponse> SearchAsync(string owner, DateTimeOffset createdDate, DateTimeOffset lastUpdatedDate, int pageIndex, int itemsPerPage = 10, string sortBy = "stars", string orderBy = "desc")
         {
             var query = new[] {
                 (Param: "user", Value:owner),

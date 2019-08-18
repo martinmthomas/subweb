@@ -10,74 +10,58 @@ namespace SubWeb.Client.Markdown
 {
     public class GithubMdService : MdBase, IMdService
     {
-        const string REPO_IDENTIFIER = "subweb-", MARKDOWN_EXT = ".md";
+        const string REPO_IDENTIFIER = "subweb-";
         const string README = "README.md";
 
-        private Github.Services.IRepository GithubRepo { get; set; }
+        private Github.Services.IRepository _githubRepo;
 
         public GithubMdService(Github.Services.IRepository githubRepo)
         {
-            GithubRepo = githubRepo;
+            _githubRepo = githubRepo;
         }
 
-        private async Task<(string Owner, string RepoName, string FilePath)> ResolveParamsAsync(string owner, string repoName = "", string filePath = "")
+
+        public async Task<IEnumerable<NavItem>> GetNavItemsAsync(GithubUri githubUri)
         {
-            if (!string.IsNullOrWhiteSpace(filePath))
-                Ensure.ArgumentNotEmpty(repoName, nameof(repoName));
+            var files = await DownloadFilesAsync(githubUri);
 
-            Ensure.ArgumentNotEmpty(owner, nameof(owner));
-
-            repoName = string.IsNullOrWhiteSpace(repoName) ? await GetDefaultRepoNameAsync(owner) : repoName;
-            filePath = string.IsNullOrWhiteSpace(filePath) ? await GetDefaultFilePathAsync(owner, repoName) : filePath;
-
-            return (owner, repoName, filePath);
+            return CreateNavItems(githubUri, files);
         }
 
 
-        public async Task<IEnumerable<NavItem>> GetNavItemsAsync(string owner, string repoName = "", string path = "")
+        public async Task<string> DownloadFileAsHtmlAsync(GithubUri githubUri)
         {
-            repoName = string.IsNullOrWhiteSpace(repoName)
-                ? await GetDefaultRepoNameAsync(owner)
-                : repoName;
-
-            var fileContainer = GetContainerName(path);
-            var files = await DownloadFilesAsync(owner, repoName, fileContainer);
-
-            var sortedNavItems = CreateNavItems(owner, repoName, path, files);
-
-            return sortedNavItems;
+            var gitParams = await ResolveParamsAsync(githubUri);
+            var mdFile = await DownloadMarkdownFileAsync(gitParams.Owner, gitParams.RepoName, gitParams.FilePath);
+            return await ConvertToHtml(mdFile, ResolveUri);
         }
 
-        public bool IsMarkdownFile(string path) => path.EndsWith(MARKDOWN_EXT);
 
-
-
-        private string GetContainerName(string path)
+        public async Task<IEnumerable<GitRepo>> GetMostStarredRepos(string user)
         {
-            // NOTE: aspnet/AspNetCore is taken as the example repository and project in the below examples mentioned in comments.
-            var containerName = "";
+            var gitRepos = await _githubRepo.SearchAsync(user, DateTimeOffset.Now.AddYears(-5), DateTimeOffset.Now.AddDays(-7), 1, 10, "stars", "desc");
 
-            if (!string.IsNullOrWhiteSpace(path))
-                if (path.EndsWith(MARKDOWN_EXT))
-                    if (path.Contains("/")) //eg: docs/Artifacts.md. Note that "docs" is the container here.
-                        containerName = path.Substring(0, path.LastIndexOf("/"));
-                    else // eg: README.md. Note the there is no container here.
-                        containerName = "";
-                else //eg: docs. Note that this already points to a container
-                    containerName = path;
-
-            return containerName;
+            return gitRepos.Items.Select(r => new GitRepo(r.Full_Name, r.Description, r.Stargazers_Count));
         }
 
-        private List<NavItem> CreateNavItems(string owner, string repoName, string requestPath, IReadOnlyCollection<ContentInfo> files)
+
+
+        private async Task<IReadOnlyCollection<ContentInfo>> DownloadFilesAsync(GithubUri githubUri)
+        {
+            var repoName = await GetRepoNameOrDefaultAsync(githubUri);
+            return await _githubRepo.GetAllContentsAsync(githubUri.Owner, repoName, githubUri.ContainerPath);
+        }
+
+
+        private List<NavItem> CreateNavItems(GithubUri githubUri, IReadOnlyCollection<ContentInfo> files)
         {
             var navItems = files
-                .Where(r => (r.Name.EndsWith(MARKDOWN_EXT) || r.Type == "dir")
+                .Where(r => (GithubUri.CheckIfMarkdownFile(r.Name) || r.Type == "dir")
                     && !r.Name.StartsWith("."))
                 .Select(r =>
                     new NavItem(
                         r.Name,
-                        owner + "/" + repoName + "/" + r.Path,
+                        githubUri.Owner + "/" + githubUri.RepoName + "/" + r.Path,
                         r.Type == "dir" ? NavType.Directory : NavType.Markdown,
                         false))
                 .OrderBy(r => r.Type)
@@ -86,62 +70,62 @@ namespace SubWeb.Client.Markdown
 
             if (navItems != null && navItems.Count > 0)
             {
-                if (IsMarkdownFile(requestPath))
-                    navItems.First(n => n.Uri.EndsWith(requestPath)).IsDefault = true;
+                if (githubUri.IsMarkdownFile)
+                    navItems.First(n => n.Uri.EndsWith(githubUri.FilePath)).IsDefault = true;
                 else if (navItems.Any(n => n.Uri.EndsWith(README)))
                     navItems.First(n => n.Uri.EndsWith(README)).IsDefault = true;
-                else if (navItems.Any(n => IsMarkdownFile(n.Uri)))
-                    navItems.First(n => IsMarkdownFile(n.Uri)).IsDefault = true;
+                else if (navItems.Any(n => GithubUri.CheckIfMarkdownFile(n.Uri)))
+                    navItems.First(n => GithubUri.CheckIfMarkdownFile(n.Uri)).IsDefault = true;
             }
 
             return navItems;
         }
 
-        public async Task<string> DownloadFileAsHtmlAsync(string owner, string repoName, string filePath)
+
+        private async Task<string> DownloadMarkdownFileAsync(string owner, string repoName, string filePath)
         {
-            var gitParams = await ResolveParamsAsync(owner, repoName, filePath);
-            var mdFile = await DownloadFileAsync(gitParams.Owner, gitParams.RepoName, gitParams.FilePath);
-            return await ConvertToHtml(mdFile, ResolveUri);
-        }
-
-        private async Task<IReadOnlyCollection<ContentInfo>> DownloadFilesAsync(string owner, string repoName, string filePath) =>
-            string.IsNullOrWhiteSpace(filePath)
-                ? await GithubRepo.GetAllContents(owner, repoName, "")
-                : await GithubRepo.GetAllContents(owner, repoName, filePath);
-
-
-        private async Task<string> DownloadFileAsync(string owner, string repoName, string filePath)
-        {
-            if (!IsMarkdownFile(filePath))
+            if (!GithubUri.CheckIfMarkdownFile(filePath))
                 return "";
 
-            var file = await GithubRepo.GetFileContent(owner, repoName, filePath);
+            var file = await _githubRepo.GetFileContentAsync(owner, repoName, filePath);
             return file.Content;
         }
 
-        private async Task<string> GetDefaultFilePathAsync(string owner, string repoName)
+
+        private async Task<(string Owner, string RepoName, string FilePath)> ResolveParamsAsync(GithubUri githubUri)
         {
-            var _files = await GithubRepo.GetAllContents(owner, repoName, "");
-            return _files.First(f => f.Name.EndsWith(MARKDOWN_EXT)).Path;
+            if (!string.IsNullOrWhiteSpace(githubUri.FilePath))
+                Ensure.ArgumentNotEmpty(githubUri.RepoName, nameof(githubUri.RepoName));
+
+            Ensure.ArgumentNotEmpty(githubUri.Owner, nameof(githubUri.Owner));
+
+            var repoName = await GetRepoNameOrDefaultAsync(githubUri);
+            var filePath = await GetFilePathOrDefaultAsync(githubUri);
+
+            return (githubUri.Owner, repoName, filePath);
         }
 
-        private async Task<string> GetDefaultRepoNameAsync(string owner)
+        private async Task<string> GetFilePathOrDefaultAsync(GithubUri githubUri)
         {
-            var repos = await GithubRepo.GetAllForUser(owner);
+            if (!string.IsNullOrWhiteSpace(githubUri.FilePath))
+                return githubUri.FilePath;
+
+            var _files = await _githubRepo.GetAllContentsAsync(githubUri.Owner, githubUri.RepoName, "");
+            return _files.First(f => GithubUri.CheckIfMarkdownFile(f.Name)).Path;
+        }
+
+        private async Task<string> GetRepoNameOrDefaultAsync(GithubUri githubUri)
+        {
+            if (!string.IsNullOrWhiteSpace(githubUri.RepoName))
+                return githubUri.RepoName;
+
+            var repos = await _githubRepo.GetAllForUserAsync(githubUri.Owner);
             return repos.First(r => r.Name.StartsWith(REPO_IDENTIFIER)).Name;
         }
 
         private string ResolveUri(string uri)
         {
             return uri;
-        }
-
-
-        public async Task<IEnumerable<GitRepo>> GetMostStarredRepos(string user)
-        {
-            var gitRepos = await GithubRepo.Search(user, DateTimeOffset.Now.AddYears(-5), DateTimeOffset.Now.AddDays(-7), 1, 10, "stars", "desc");
-
-            return gitRepos.Items.Select(r => new GitRepo(r.Full_Name, r.Description, r.Stargazers_Count));
         }
     }
 }

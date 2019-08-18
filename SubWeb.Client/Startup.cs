@@ -13,6 +13,7 @@ namespace SubWeb.Client
             services.AddSingleton<IMdService, GithubMdService>();
             services.AddSingleton<IRepository, Repository>();
             services.AddSingleton<IAlertService, AlertService>();
+            services.AddSingleton<IGithubUriService, GithubUriService>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

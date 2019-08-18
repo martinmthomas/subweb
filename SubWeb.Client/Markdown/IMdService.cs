@@ -6,9 +6,8 @@ namespace SubWeb.Client.Markdown
 {
     public interface IMdService
     {
-        Task<string> DownloadFileAsHtmlAsync(string owner, string repoName, string filePath);
-        bool IsMarkdownFile(string path);
-        Task<IEnumerable<NavItem>> GetNavItemsAsync(string owner, string repoName = "", string path = "");
+        Task<string> DownloadFileAsHtmlAsync(GithubUri githubUri);
+        Task<IEnumerable<NavItem>> GetNavItemsAsync(GithubUri githubUri);
         Task<IEnumerable<GitRepo>> GetMostStarredRepos(string user);
     }
 }
