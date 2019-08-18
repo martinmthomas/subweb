@@ -1,0 +1,39 @@
+﻿@using SubWeb.Client.Model;
+
+<div class="topbar sticky-top">
+    <div class="top-row pl-4 navbar navbar-dark">
+        <a class="navbar-brand" href="@UriHelper.GetBaseUri()">SubWeb</a>
+        <button class="navbar-toggler @(Items.Count() > 0 ? "border-warning" : "")" @onclick="@ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+
+    <div class="@NavMenuCssClass" @onclick="@ToggleNavMenu">
+        <ul class="nav flex-column">
+            @foreach (var navItem in Items)
+            {
+                <li class="nav-item px-3">
+                    <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" href="@navItem.Uri">
+                        <span class="@(navItem.Type == Model.NavType.Directory ? "oi oi-project" : "")" aria-hidden="true"></span>
+                        @navItem.Title
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+
+@code {
+
+    [Inject]
+    public IUriHelper UriHelper { get; set; }
+
+    [Parameter]
+    public IEnumerable<NavItem> Items { get; set; }
+
+    public string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    
+    public bool collapseNavMenu { get; set; } = true;
+    public void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+}

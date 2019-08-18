@@ -18,8 +18,6 @@ namespace SubWeb.Client.Pages.CodeBehind
         public bool IsLoading = false;
 
 
-        public bool collapseNavMenu = true;
-        public string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
         public IEnumerable<NavItem> NavItems = new NavItem[0];
 
 
@@ -41,7 +39,6 @@ namespace SubWeb.Client.Pages.CodeBehind
         [Inject]
         public IGithubUriService GithubUriService { get; set; }
 
-        public void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
         protected override async Task OnInitAsync()
         {

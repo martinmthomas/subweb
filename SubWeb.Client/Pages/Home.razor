@@ -4,39 +4,30 @@
 
 
 
+<Nav Items="@NavItems"></Nav>
 
-<div class="sidebar sticky-top">
-    <div class="top-row pl-4 navbar navbar-dark">
-        <a class="navbar-brand" href="@UriHelper.GetBaseUri()">SubWeb</a>
-        <button class="navbar-toggler @(NavItems.Count() > 0 ? "border-warning" : "")" onclick="@ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+
+@if (!string.IsNullOrWhiteSpace(ConvHtml))
+{
+    <div class="main">
+        <div class="content px-4">
+            <article class="markdown-body mb-5">
+                @((MarkupString)ConvHtml)
+            </article>
+
+        </div>
     </div>
-
-    <div class="@NavMenuCssClass" onclick="@ToggleNavMenu">
-        <ul class="nav flex-column">
-            @foreach (var navItem in NavItems)
-            {
-                <li class="nav-item px-3">
-                    <a class="@(navItem.IsDefault ? "nav-link active" : "nav-link")" href="@navItem.Uri">
-                        <span class="@(navItem.Type == Model.NavType.Directory ? "oi oi-project" : "")" aria-hidden="true"></span>
-                        @navItem.Title
-                    </a>
-                </li>
-            }
-        </ul>
-    </div>
-</div>
+}
 
 
-<div class="main">
-    <div class="content px-4">
+@if (!ShowingHtml)
+{
+    <div class="main">
+        <div class="content px-4">
 
-        <Loading InProgress="IsLoading"></Loading>
+            <Loading InProgress="IsLoading"></Loading>
 
 
-        @if (!ShowingHtml)
-        {
             <div class="alert-info p-3 text-break">
                 <p><strong>SubWeb</strong> is an online tool to generate html pages from markdown files hosted in Github repositories. For more details see <a href="@UriHelper.GetBaseUri().TrimEnd('/')/martinmthomas/subweb/README.md">documentation</a>.</p>
                 <p>
@@ -55,7 +46,7 @@
                 Click on <span class="small oi oi-external-link"></span> icon to access the github repository.
             </p>
 
-            foreach (var repo in StarredRepos)
+            @foreach (var repo in StarredRepos)
             {
                 <div class="card">
                     <div class="card-body">
@@ -70,18 +61,6 @@
                     </div>
                 </div>
             }
-        }
-
-
-
-        @if (!string.IsNullOrWhiteSpace(ConvHtml))
-        {
-            <article class="markdown-body mb-5">
-
-
-                @((MarkupString)ConvHtml)
-            </article>
-        }
-
+        </div>
     </div>
-</div>
+}
