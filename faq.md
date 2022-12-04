@@ -9,14 +9,6 @@ Blazor lets you build interactive web UIs using C# instead of JavaScript. Blazor
 
 No, SubWeb has got not a single line of javascript! All the client side logic, like generating Navigation items, Markdown conversion, etc. are all written in pure C# and as a Single Page Application. However, behind the scenes Blazor uses javascript to achieve some of its functionalities like Url routing. But this happens oblivious to developer. Also, it is important to note that Blazor provides javascript interop if one needs to write javacsript along with C#
 
-**3. Why first time loading is slow?**
-
-In order to make C# code executable in browser, Blazor needs to download the core libraries like mscorlib.dll to provide the .net ecosystem. Currently, there are multiple files and it takes around 3MB space in total. Downloading these files in browser could take a while depending on the connection speed. Note that this should be a one time issue only as Blazor caches the libraries just like any other static asset.
-
-**4. Sometimes I get errors that url cannot be found**
-
-Urls are case sensitive. This is a less known fact. But most of the DNS servers and web servers try to guess the right web page url by trying to resolve the letter case by itself. This does not work all the time. So, if a file is saved as faq.md in Github, then the url must end with "faq.md" and not FAQ.md or Faq.md.
-
-**5. What's next for SubWeb?**
+**3. What's next for SubWeb?**
 
 See WishList section in README.md.

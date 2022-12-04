@@ -10,7 +10,10 @@
     </div>
 
     <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-        <div class="nav-title">Markdown docs</div>
+        @if (Items.Count() > 0)
+        {
+            <div class="nav-title">Markdown docs</div>
+        }
 
         <ul class="nav flex-column">
             @foreach (var navItem in Items)
