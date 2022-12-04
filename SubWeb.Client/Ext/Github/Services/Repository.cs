@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
-using SubWeb.Client.Exceptions;
+﻿using SubWeb.Client.Exceptions;
 using SubWeb.Client.Ext.Github.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Net.Http.Json;
 
 namespace Github.Services
 {
@@ -34,11 +29,17 @@ namespace Github.Services
                 .Replace(UriParts.REPO, repoName)
                 .Replace(UriParts.PATH, path);
 
-            return (await HttpClient.GetJsonAsync<List<ContentInfo>>(url)).AsReadOnly();
+            var contents = await HttpClient.GetFromJsonAsync<List<ContentInfo>>(url);
+            if (contents == null)
+            {
+                throw new ArgumentException("No content found in the repo.");
+            }
+
+            return (contents).AsReadOnly();
         }
 
 
-        public async Task<File> GetFileContentAsync(string owner, string repoName, string path)
+        public async Task<RepoFile> GetFileContentAsync(string owner, string repoName, string path)
         {
             Ensure.ArgumentNotEmpty(owner, nameof(owner));
             Ensure.ArgumentNotEmpty(repoName, nameof(repoName));
@@ -49,7 +50,7 @@ namespace Github.Services
                 .Replace(UriParts.REPO, repoName)
                 .Replace(UriParts.PATH, path);
 
-            var repoFileContent = await HttpClient.GetJsonAsync<File>(url);
+            var repoFileContent = await HttpClient.GetFromJsonAsync<RepoFile>(url);
             repoFileContent.Content = FromBase64String(repoFileContent.Content);
             return repoFileContent;
         }
@@ -59,7 +60,7 @@ namespace Github.Services
         {
             var url = GITHUB_REPOS_URL.Replace(UriParts.OWNER, owner);
 
-            return await HttpClient.GetJsonAsync<List<Repo>>(url);
+            return await HttpClient.GetFromJsonAsync<List<Repo>>(url);
         }
 
 
@@ -84,7 +85,7 @@ namespace Github.Services
             .Aggregate((a, b) => $"{a}&{b}");
 
             var url = $"{GITHUB_REPOS_SEARCH_URL}?{queryString}";
-            return await HttpClient.GetJsonAsync<SearchResponse>(url);
+            return await HttpClient.GetFromJsonAsync<SearchResponse>(url);
         }
 
         private string FromBase64String(string encodedText)

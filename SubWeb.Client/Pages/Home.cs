@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using SubWeb.Client.Markdown;
 using SubWeb.Client.Model;
 using SubWeb.Client.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SubWeb.Client.Pages.CodeBehind
 {
@@ -27,8 +24,15 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         public string GitProjUri = "";
 
+        /// <summary>
+        /// We don't need to use the Params. But setting this as a "catch-all" parameter in @page is needed 
+        /// to get the route details using NavigationManager.
+        /// </summary>
+        [Parameter]
+        public string? Params { get; set; }
+
         [Inject]
-        public IUriHelper UriHelper { get; set; }
+        public NavigationManager UriHelper { get; set; }
 
         [Inject]
         public IMdService GithubMdService { get; set; }
@@ -39,12 +43,12 @@ namespace SubWeb.Client.Pages.CodeBehind
         [Inject]
         public IGithubUriService GithubUriService { get; set; }
 
-
-        protected override async Task OnInitAsync()
+        protected override async Task OnInitializedAsync()
         {
             try
             {
                 IsLoading = true;
+
                 if (GithubUriService.IsCurrentUriValid())
                 {
                     await LoadPageAsync();
@@ -102,14 +106,14 @@ namespace SubWeb.Client.Pages.CodeBehind
 
         protected override Task OnParametersSetAsync()
         {
-            UriHelper.OnLocationChanged += UriHelper_OnLocationChanged;
+            UriHelper.LocationChanged += UriHelperLocationChanged;
 
             return base.OnParametersSetAsync();
         }
 
-        private async void UriHelper_OnLocationChanged(object sender, string e)
+        private async void UriHelperLocationChanged(object? sender, LocationChangedEventArgs args)
         {
-            await OnInitAsync();
+            await OnInitializedAsync();
 
             StateHasChanged();
         }
@@ -125,7 +129,7 @@ namespace SubWeb.Client.Pages.CodeBehind
             {
                 await HandleException(ex);
             }
-        }      
+        }
 
         private async Task GenerateBody()
         {

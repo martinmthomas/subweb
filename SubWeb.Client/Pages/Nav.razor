@@ -2,13 +2,16 @@
 
 <div class="topbar sticky-top">
     <div class="top-row pl-4 navbar navbar-dark">
-        <a class="navbar-brand" href="@UriHelper.GetBaseUri()">SubWeb</a>
-        <button class="navbar-toggler @(Items.Count() > 0 ? "border-warning" : "")" @onclick="@ToggleNavMenu">
+        <button class="navbar-toggler @(Items.Count() > 0 ? "border-warning" : "") mr-3" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <a class="navbar-brand" href="@UriHelper.BaseUri">SubWeb</a>
     </div>
 
-    <div class="@NavMenuCssClass" @onclick="@ToggleNavMenu">
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+        <div class="nav-title">Markdown docs</div>
+
         <ul class="nav flex-column">
             @foreach (var navItem in Items)
             {
@@ -27,10 +30,10 @@
 @functions {
 
     [Inject]
-    public IUriHelper UriHelper { get; set; }
+    public NavigationManager UriHelper { get; set; } = null!;
 
     [Parameter]
-    public IEnumerable<NavItem> Items { get; set; }
+    public IEnumerable<NavItem> Items { get; set; } = null!;
 
     public string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     

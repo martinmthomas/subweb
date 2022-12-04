@@ -1,15 +1,14 @@
 ﻿@layout MainLayout
-@page "/"
+@page "/{*params}"
 @inherits SubWeb.Client.Pages.CodeBehind.Home
 
-
-
 <Nav Items="@NavItems"></Nav>
-
 
 @if (!string.IsNullOrWhiteSpace(ConvHtml))
 {
     <div class="main">
+        <div class="repo-title">@githubUri.RepoName</div>
+
         <div class="content px-4">
             <article class="markdown-body mb-5">
                 @((MarkupString)ConvHtml)
@@ -27,16 +26,15 @@
 
             <Loading InProgress="IsLoading"></Loading>
 
-
             <div class="alert-info p-3 text-break">
-                <p><strong>SubWeb</strong> is an online tool to generate html pages from markdown files hosted in Github repositories. For more details see <a href="@UriHelper.GetBaseUri().TrimEnd('/')/martinmthomas/subweb/README.md">documentation</a>.</p>
+                <p><strong>SubWeb</strong> is an online tool to generate html pages from markdown files hosted in Github repositories. For more details see <a href="@UriHelper.BaseUri.TrimEnd('/')/martinmthomas/subweb/README.md">documentation</a>.</p>
                 <p>
                     <label for="basic-url">Enter the github project path in the following text box and press Load.</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">Github path</span>
                         </div>
-                        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" aria-label="aspnet/AspNetCore" bind="@GitProjUri" placeholder="aspnet/AspNetCore" />
+                        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" aria-label="aspnet/aspnetcore" @bind="GitProjUri" placeholder="aspnet/aspnetcore" />
                         <a id="loadRepoBtn" class="btn btn-primary ml-sm-1" href="@GitProjUri">Load</a>
                     </div>
                 </p>
